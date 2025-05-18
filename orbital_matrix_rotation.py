@@ -4,6 +4,8 @@
 # Version: 1.1
 # © 2025 Zhang Anjun. All rights reserved.
 
+from sys import exit as sysExit
+
 def orbitalRotation(matrix, n, step):
     r, c = n, n                             # n, n is the starting upper left index
     latest = matrix[r][c]
@@ -101,6 +103,13 @@ def readMatrix():                           # Optional feature: let the user to 
         i = i + 1
     return matrix
 
+def copyrightNotice():
+    print("")
+    print("Author: Zhang Anjun")
+    print("Version: 1.1")
+    print("© 2025 Zhang Anjun. All rights reserved.")
+    print("")
+
 matrix, n, step = prompt()
 print("Matrix before rotation: ")
 printMatrix(matrix)
@@ -108,3 +117,7 @@ orbitalRotation(matrix, n, step)
 print("")
 print("Matrix after rotation: ")
 printMatrix(matrix)
+
+copyrightNotice()
+input("Press Enter to exit. ")
+sysExit(0)
