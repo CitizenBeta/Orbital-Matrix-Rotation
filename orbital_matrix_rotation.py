@@ -1,23 +1,35 @@
 # File Name: orbital_matrix_rotation.py
 # Author: Zhang Anjun
-# Date: 2025-05-07
-# Version: 0.1
+# Date: 2025-05-18
+# Version: 1.0
 # © 2025 Zhang Anjun. All rights reserved.
 
-def prompt():
-    matrix = [
-        [ 1,  2,  3,  4,  5,  6,  7],
-        [ 8,  9, 10,  1,  2,  3,  4],
-        [10, 11, 12, 13, 14, 15, 16],
-        [ 0,  9,  8,  7,  6,  5,  4],
-        [ 2,  4,  6,  8, 10,  9,  8],
-        [ 4,  8,  0,  9,  5,  7,  3],
-        [ 7,  6,  8,  2,  1,  0,  6],
-    ]
+def main(matrix, n, step):
+    r, c = n, n                             # n, n is the starting upper left index
+    latest = matrix[r][c]
+    r, c = nextPosition(n, step, r, c)
+    matrix, latest = swapElement(matrix, r, c, latest)
+    while r != n or c != n:                 # Break the loop when go back to the starting point
+        r, c = nextPosition(n, step, r, c)
+        matrix, latest = swapElement(matrix, r, c, latest)
+    return matrix
 
-    n = int(input("Please choose an orbit: "))
-    step = int(input("Please enter a rotation number: "))
-    return matrix, n, step
+def nextPosition(n, step, r, c):            # Find the next position to swap
+    while step != 0:
+        r, c = orbit(n, step, r, c)
+        step = step - direction(step)
+    return r, c
+
+def swapElement(matrix, r, c, latest):
+    matrix[r][c], latest = latest, matrix[r][c]
+    return matrix, latest
+
+def orbit(n, step, r, c):                   # Move 1 place clockwise/anti-clockwise. Use a loop to control moving
+    if direction(step) == 1:
+        r, c = clockwiseRotation(n, r, c)
+    else:
+        r, c = anticlockwiseRotation(n, r, c)
+    return r, c
 
 def direction(step):                        # Determine whether clockwise or anti-clockwise
     if step >= 0:
@@ -25,40 +37,67 @@ def direction(step):                        # Determine whether clockwise or ant
     elif step < 0:
         return -1
 
-def orbit(n, i, j, step):
-    if direction(step) == 1:                # Move 1 place clockwise
-        if i == n and j < 6 - n:
+def clockwiseRotation(n, r, c):             # Move 1 place clockwise
+    if r == n and c < 6 - n:
+        c = c + 1
+    elif r < 6 - n and c == 6 - n:
+        r = r + 1
+    elif r == 6 - n and c > n:
+        c = c - 1
+    elif r > n and c == n:
+        r = r - 1
+    return r, c
+
+def anticlockwiseRotation(n, r, c):         # Move 1 place anti-clockwise
+    if r == n and c > n:
+        c = c - 1
+    elif r < 6 - n and c == n:
+        r = r + 1
+    elif r == 6 - n and c < 6 - n:
+        c = c + 1
+    elif r > n and c == 6 - n:
+        r = r - 1
+    return r, c
+
+def prompt():
+    # matrix = readMatrix()
+    matrix = [
+        [1, 2, 3, 4, 5, 6, 7],
+        [8, 9, 8, 1, 2, 1, 4],
+        [1, 2, 7, 5, 4, 3, 9],
+        [0, 9, 8, 7, 6, 5, 4],
+        [2, 4, 6, 8, 5, 9, 8],
+        [4, 8, 0, 9, 5, 7, 3],
+        [7, 6, 8, 2, 1, 0, 6],
+    ]
+    n = int(input("Please choose an orbit: "))
+    step = int(input("Please enter a rotation number: "))
+    return matrix, n, step
+
+def printMatrix(matrix):
+    r = 0
+    while r != 7:
+        print(matrix[r])
+        r = r + 1
+
+def readMatrix():                           # Optional feature: let the user to enter a matrix
+    matrix = []
+    i = 0
+    while i != 7:
+        j = 0
+        r = []
+        while j != 7:
+            value = int(input("Please enter a number: "))
+            r.append(value)
             j = j + 1
-        elif i < 6 - n and j == 6 - n:
-            i = i + 1
-        elif i == 6 - n and j > n:
-            j = j - 1
-        elif i > n and j == n:
-            i = i - 1
-    else:                                   # Move 1 place anti-clockwise
-        if i == n and j > n:
-            j = j - 1
-        elif i < 6 - n and j == n:
-            i = i + 1
-        elif i == 6 - n and j < 6 - n:
-            j = j + 1
-        elif i > n and j == 6 - n:
-            i = i - 1
-    return i, j
+        matrix.append(r)
+        i = i + 1
+    return matrix
 
-
-def swap(matrix, i, j, latest):
-    matrix[i][j] = latest
-    i, j = orbit(n, i, j, step)
-    latest = matrix[i][j]
-
-def rotation(matrix, n, step):
-    i, j = n, n
-    k = 20
-    while k != 0:
-        print(matrix[i][j])
-        i, j = orbit(n, i, j, step)
-        k = k - 1
-    
 matrix, n, step = prompt()
-rotation(matrix, n, step)
+print("Matrix before rotation: ")
+printMatrix(matrix)
+main(matrix, n, step)
+print("")
+print("Matrix after rotation: ")
+printMatrix(matrix)
