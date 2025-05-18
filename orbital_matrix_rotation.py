@@ -1,18 +1,25 @@
 # File Name: orbital_matrix_rotation.py
 # Author: Zhang Anjun
 # Date: 2025-05-18
-# Version: 1.0
+# Version: 1.1
 # © 2025 Zhang Anjun. All rights reserved.
 
-def main(matrix, n, step):
+def orbitalRotation(matrix, n, step):
     r, c = n, n                             # n, n is the starting upper left index
     latest = matrix[r][c]
-    r, c = nextPosition(n, step, r, c)
+    step = modStep(step)                    # Reduce rotation time when step is bigger than circumference
+    r, c = nextPosition(n, step, r, c)      # "latest" is the previous number of the updated matrix[r][c]
     matrix, latest = swapElement(matrix, r, c, latest)
     while r != n or c != n:                 # Break the loop when go back to the starting point
         r, c = nextPosition(n, step, r, c)
         matrix, latest = swapElement(matrix, r, c, latest)
     return matrix
+
+def modStep(step):
+    side = 7 - (2 * n)
+    circumference = (4 * side) - 4
+    step = ((direction(step) * step) % circumference) * direction(step)
+    return step
 
 def nextPosition(n, step, r, c):            # Find the next position to swap
     while step != 0:
@@ -27,7 +34,7 @@ def swapElement(matrix, r, c, latest):
 def orbit(n, step, r, c):                   # Move 1 place clockwise/anti-clockwise. Use a loop to control moving
     if direction(step) == 1:
         r, c = clockwiseRotation(n, r, c)
-    else:
+    elif direction(step) == -1:
         r, c = anticlockwiseRotation(n, r, c)
     return r, c
 
@@ -70,7 +77,7 @@ def prompt():
         [4, 8, 0, 9, 5, 7, 3],
         [7, 6, 8, 2, 1, 0, 6],
     ]
-    n = int(input("Please choose an orbit: "))
+    n = int(input("Please choose an orbit (0-2): "))
     step = int(input("Please enter a rotation number: "))
     return matrix, n, step
 
@@ -97,7 +104,7 @@ def readMatrix():                           # Optional feature: let the user to 
 matrix, n, step = prompt()
 print("Matrix before rotation: ")
 printMatrix(matrix)
-main(matrix, n, step)
+orbitalRotation(matrix, n, step)
 print("")
 print("Matrix after rotation: ")
 printMatrix(matrix)
