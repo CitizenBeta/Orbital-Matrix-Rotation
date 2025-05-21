@@ -1,75 +1,84 @@
 # File Name: orbital_matrix_rotation.py
 # Author: Zhang Anjun
-# Date: 2025-05-18
-# Version: 1.1
+# Date: 2025-05-21
+# Version: 1.2
 # © 2025 Zhang Anjun. All rights reserved.
 
 from sys import exit as sysExit
 
 def orbitalRotation(matrix, n, step):
-    r, c = n, n                             # n, n is the starting upper left index
-    latest = matrix[r][c]
-    step = modStep(step)                    # Reduce rotation time when step is bigger than circumference
-    r, c = nextPosition(n, step, r, c)      # "latest" is the previous number of the updated matrix[r][c]
-    matrix, latest = swapElement(matrix, r, c, latest)
-    while r != n or c != n:                 # Break the loop when go back to the starting point
-        r, c = nextPosition(n, step, r, c)
-        matrix, latest = swapElement(matrix, r, c, latest)
+    step = modStep(n, step)
+    absStep = step * direction(step)
+    if step == 0:
+        return matrix
+    i = 0
+    while i != absStep:
+        row, col = n, n
+        latest = matrix[row][col]
+        j = 0
+        while j != calCircumference(n):
+            nextRow, nextCol = orbit(n, step, row, col)
+            matrix[nextRow][nextCol], latest = latest, matrix[nextRow][nextCol]
+            row, col = nextRow, nextCol
+            j = j + 1
+        i = i + 1
     return matrix
 
-def modStep(step):
+def calCircumference(n):
     side = 7 - (2 * n)
     circumference = (4 * side) - 4
-    step = ((direction(step) * step) % circumference) * direction(step)
+    return circumference
+
+def modStep(n, step):
+    sign = direction(step)
+    absStep = sign * step
+    circumference = calCircumference(n)
+    step = (absStep % circumference) * sign
     return step
 
-def nextPosition(n, step, r, c):            # Find the next position to swap
+def nextSwapPosition(n, step, row, col):
     while step != 0:
-        r, c = orbit(n, step, r, c)
+        row, col = orbit(n, step, row, col)
         step = step - direction(step)
-    return r, c
+    return row, col
 
-def swapElement(matrix, r, c, latest):
-    matrix[r][c], latest = latest, matrix[r][c]
-    return matrix, latest
-
-def orbit(n, step, r, c):                   # Move 1 place clockwise/anti-clockwise. Use a loop to control moving
+def orbit(n, step, row, col):                                       # Move 1 place clockwise/anti-clockwise. Use a loop to control moving
     if direction(step) == 1:
-        r, c = clockwiseRotation(n, r, c)
+        row, col = clockwiseRotation(n, row, col)
     elif direction(step) == -1:
-        r, c = anticlockwiseRotation(n, r, c)
-    return r, c
+        row, col = anticlockwiseRotation(n, row, col)
+    return row, col
 
-def direction(step):                        # Determine whether clockwise or anti-clockwise
+def direction(step):                                                # Determine whether clockwise or anti-clockwise
     if step >= 0:
         return 1
     elif step < 0:
         return -1
 
-def clockwiseRotation(n, r, c):             # Move 1 place clockwise
-    if r == n and c < 6 - n:
-        c = c + 1
-    elif r < 6 - n and c == 6 - n:
-        r = r + 1
-    elif r == 6 - n and c > n:
-        c = c - 1
-    elif r > n and c == n:
-        r = r - 1
-    return r, c
+def clockwiseRotation(n, row, col):                                 # Move 1 place clockwise
+    if row == n and col < 6 - n:
+        col = col + 1
+    elif row < 6 - n and col == 6 - n:
+        row = row + 1
+    elif row == 6 - n and col > n:
+        col = col - 1
+    elif row > n and col == n:
+        row = row - 1
+    return row, col
 
-def anticlockwiseRotation(n, r, c):         # Move 1 place anti-clockwise
-    if r == n and c > n:
-        c = c - 1
-    elif r < 6 - n and c == n:
-        r = r + 1
-    elif r == 6 - n and c < 6 - n:
-        c = c + 1
-    elif r > n and c == 6 - n:
-        r = r - 1
-    return r, c
+def anticlockwiseRotation(n, row, col):                             # Move 1 place anti-clockwise
+    if row == n and col > n:
+        col = col - 1
+    elif row < 6 - n and col == n:
+        row = row + 1
+    elif row == 6 - n and col < 6 - n:
+        col = col + 1
+    elif row > n and col == 6 - n:
+        row = row - 1
+    return row, col
 
 def prompt():
-    # matrix = readMatrix()
+    print("Matrix before rotation: ")
     matrix = [
         [1, 2, 3, 4, 5, 6, 7],
         [8, 9, 8, 1, 2, 1, 4],
@@ -79,40 +88,26 @@ def prompt():
         [4, 8, 0, 9, 5, 7, 3],
         [7, 6, 8, 2, 1, 0, 6],
     ]
+    printMatrix(matrix)
+    print("")
     n = int(input("Please choose an orbit (0-2): "))
     step = int(input("Please enter a rotation number: "))
     return matrix, n, step
 
 def printMatrix(matrix):
-    r = 0
-    while r != 7:
-        print(matrix[r])
-        r = r + 1
-
-def readMatrix():                           # Optional feature: let the user to enter a matrix
-    matrix = []
-    i = 0
-    while i != 7:
-        j = 0
-        r = []
-        while j != 7:
-            value = int(input("Please enter a number: "))
-            r.append(value)
-            j = j + 1
-        matrix.append(r)
-        i = i + 1
-    return matrix
+    row = 0
+    while row != 7:
+        print(matrix[row])
+        row = row + 1
 
 def copyrightNotice():
     print("")
     print("Author: Zhang Anjun")
-    print("Version: 1.1")
+    print("Version: 1.2")
     print("© 2025 Zhang Anjun. All rights reserved.")
     print("")
 
 matrix, n, step = prompt()
-print("Matrix before rotation: ")
-printMatrix(matrix)
 orbitalRotation(matrix, n, step)
 print("")
 print("Matrix after rotation: ")
