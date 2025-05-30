@@ -1,7 +1,7 @@
 # File Name: orbital_matrix_rotation.py
 # Author: Zhang Anjun
-# Date: 2025-05-22
-# Version: 2.0
+# Date: 2025-05-30
+# Version: 2.1
 # © 2025 Zhang Anjun. All rights reserved.
 
 from sys import exit as sysExit
@@ -9,24 +9,21 @@ from sys import exit as sysExit
 def copyrightNotice():
     print("")
     print("Author: Zhang Anjun")
-    print("Version: 2.0")
+    print("Version: 2.1")
     print("© 2025 Zhang Anjun. All rights reserved.")
     print("")
 
 def orbitalRotation(matrix, n, step):
-    direction = sign(step)                                  # Find rotation direction
-    step = modStep(n, step)                                 # Avoid full-circle rotations
+    if step >= 0:                                           # Find rotation direction
+        direction = 1
+    elif step < 0:
+        direction = -1
+    step = modStep(n, step)                                 # Avoid full-circle rotations. "step" keeps positive from now
     i = 0
     while i != step:                                        # Move multiple steps
         matrix = rotateOnePlace(matrix, n, direction)       # Move one place each time
         i = i + 1
     return matrix
-
-def sign(step):
-    if step >= 0:
-        return 1
-    elif step < 0:
-        return -1
 
 def modStep(n, step):
     circumference = getCircumference(n)
@@ -103,7 +100,7 @@ def printMatrix(matrix):
         row = row + 1
 
 matrix, n, step = prompt()
-orbitalRotation(matrix, n, step)
+matrix = orbitalRotation(matrix, n, step)
 print("")
 print("Matrix after rotation: ")
 printMatrix(matrix)
